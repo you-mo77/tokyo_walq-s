@@ -45,7 +45,7 @@ def edit_data():
     return df
 
 # 主成分分析
-def pca(df:pd.DataFrame):
+def pca(df:pd.DataFrame, n:int):
     # データの標準化 iloc -> dataframeの各行、列を指定するメソッド apply -> 各行列に対して指定関数を使用 axis=0 -> 列操作
     dfs = df.iloc[:, 0:].apply(lambda x: (x - x.mean()) / x.std(), axis=0)
 
@@ -53,7 +53,7 @@ def pca(df:pd.DataFrame):
     dfs_cleaned = dfs.dropna(axis=1, how="any")
 
     # 主成分分析の実行(PCAモデル作成) 第10主成分まで抽出 主成分最大数は行数(サンプル数)らしい　なぜ？
-    pca = PCA(n_components=10)
+    pca = PCA(n_components=n)
 
     # データをPCAモデルに適用
     pca.fit(dfs_cleaned)
@@ -62,19 +62,30 @@ def pca(df:pd.DataFrame):
     feature = pca.transform(dfs_cleaned)
 
     # 主成分得点(各主成分軸状での各データの変換後の値)
-    pd.DataFrame(feature, columns=["PC{}".format(x + 1) for x in range(10)])
+    #score = pd.DataFrame(feature, columns=["PC{}".format(x + 1) for x in range(0, n)])
 
     # 主成分プロット(とりあえず第1, 第2主成分)
-    plt.scatter(feature[0:feature.shape[0]-1, 0], feature[0:feature.shape[0]-1, 1])
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
+    #plt.scatter(feature[0:feature.shape[0]-1, 0], feature[0:feature.shape[0]-1, 1])
+    #plt.xlabel("PC1")
+    #lt.ylabel("PC2")
 
+    # 寄与率(各主成分についてどれだけ説明できてるか -> 累積寄与率は最終的には1になる)
+    #ratio = pd.DataFrame(pca.explained_variance_ratio_, index=["PC{}".format(x + 1) for x in range(0, n)])
+    
+    # 負荷率(各主成分に対して、各変数がどの程度影響しているか)
+    eigen_vector = pca.components_
+    eigen =pd.DataFrame(eigen_vector,
+                        columns=[dfs_cleaned.columns],
+                        index = ["主成分{}".format(x+1) for x in range(0, n)])
+    print(eigen)
     plt.show()
 
 # メイン関数
 def main():
     df = edit_data()
-    pca(df)
+    # 第n主成分まで生成
+    n = 10
+    pca(df, n)
 
 # 実行部分
 if __name__ == "__main__":
