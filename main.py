@@ -4,6 +4,7 @@ from sklearn.decomposition import PCA, TruncatedSVD
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime, timedelta
+import japanize_matplotlib
 
 # 時間文字列をint[秒]に変換
 def time_convert_into_int(time_str:str):
@@ -62,7 +63,7 @@ def pca(df:pd.DataFrame, n:int):
     feature = pca.transform(dfs_cleaned)
 
     # 主成分得点(各主成分軸状での各データの変換後の値)
-    #score = pd.DataFrame(feature, columns=["PC{}".format(x + 1) for x in range(0, n)])
+    score = pd.DataFrame(feature, columns=["PC{}".format(x + 1) for x in range(0, n)])
 
     # 主成分プロット(とりあえず第1, 第2主成分)
     #plt.scatter(feature[0:feature.shape[0]-1, 0], feature[0:feature.shape[0]-1, 1])
@@ -88,21 +89,64 @@ def pca(df:pd.DataFrame, n:int):
     eigen =pd.DataFrame(eigen_vector,
                         columns=[dfs_cleaned.columns],
                         index = ["PC{}".format(x+1) for x in range(0, n)])
-    print(eigen)
+    #print(eigen)
+
+    # 要素名抽出(以降のグラフ表示の際に使用)
+    v_name = eigen.columns.to_numpy()
+    v_name = [i[0] for i in v_name]
+    v_name = np.array(v_name)
+    print(v_name)
 
     # excelデータへ変換
     with pd.ExcelWriter("PCA_OUTPUT.xlsx") as writer:
         eigenvalue.to_excel(writer, sheet_name="固有値")
         ratio.to_excel(writer, sheet_name="寄与率")
         eigen.to_excel(writer, sheet_name="負荷率")
+        score.to_excel(writer, sheet_name="主成分得点表")
 
+    # 各変数を横棒グラフへ
+    count = 1
+    for index in eigen.index:
+        # サブプロット
+        plt.subplot(1, 8, count)
+
+        # メモリ
+        plt.tick_params(labelbottom=False, labelright=False, labeltop=False, bottom=False, left=False, right=False, top=False)
+        if count != 1:
+            plt.tick_params(labelbottom=False, labelleft=False, labelright=False, labeltop=False, bottom=False, left=False, right=False, top=False)
+        
+        # 各表題
+        plt.title("PC"+str(count))
+
+        # 配置調整
+        plt.subplots_adjust(wspace=0, hspace=0, left=0.3)
+
+        # 本ループのプロットデータを抽出 -> ndarray
+        plot_data = eigen.loc[index].to_numpy()
+        color = [("#ee7800" if i > 0 else "b") for i in plot_data]
+
+
+       
+        # グラフ作成
+        plt.barh(v_name, plot_data, color=color)
+
+        # カウント
+        count += 1
+
+    # グラフ表示
     plt.show()
+    plt.savefig("aaaa.png")
+    
+    
+
+
+
 
 # メイン関数
 def main():
     df = edit_data()
     # 第n主成分まで生成
-    n = 20
+    n = 8
     pca(df, n)
 
 # 実行部分
