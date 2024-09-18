@@ -16,6 +16,39 @@ def time_convert_into_int(time_str:str):
 
     return time_int
 
+# グラフ出力
+def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
+    # 各変数を横棒グラフへ
+    count = 1
+    for index in eigen.index:
+        # サブプロット
+        plt.subplot(1, 8, count)
+
+        # メモリ
+        plt.tick_params(labelbottom=False, labelright=False, labeltop=False, bottom=False, left=False, right=False, top=False)
+        if count != 1:
+            plt.tick_params(labelbottom=False, labelleft=False, labelright=False, labeltop=False, bottom=False, left=False, right=False, top=False)
+        
+        # 各表題
+        plt.title("PC"+str(count))
+
+        # 配置調整
+        plt.subplots_adjust(wspace=0, hspace=0, left=0.3)
+
+        # 本ループのプロットデータを抽出 -> ndarray
+        plot_data = eigen.loc[index].to_numpy()
+        color = [("#ee7800" if i > 0 else "b") for i in plot_data]
+
+        # グラフ作成
+        plt.barh(v_name, plot_data, color=color)
+
+        # カウント
+        count += 1
+
+    # グラフ表示
+    plt.show()
+    plt.savefig("aaaa.png")
+
 # データ加工
 def edit_data():
     # ファイルパス
@@ -104,50 +137,16 @@ def pca(df:pd.DataFrame, n:int):
         eigen.to_excel(writer, sheet_name="負荷率")
         score.to_excel(writer, sheet_name="主成分得点表")
 
-    # 各変数を横棒グラフへ
-    count = 1
-    for index in eigen.index:
-        # サブプロット
-        plt.subplot(1, 8, count)
-
-        # メモリ
-        plt.tick_params(labelbottom=False, labelright=False, labeltop=False, bottom=False, left=False, right=False, top=False)
-        if count != 1:
-            plt.tick_params(labelbottom=False, labelleft=False, labelright=False, labeltop=False, bottom=False, left=False, right=False, top=False)
-        
-        # 各表題
-        plt.title("PC"+str(count))
-
-        # 配置調整
-        plt.subplots_adjust(wspace=0, hspace=0, left=0.3)
-
-        # 本ループのプロットデータを抽出 -> ndarray
-        plot_data = eigen.loc[index].to_numpy()
-        color = [("#ee7800" if i > 0 else "b") for i in plot_data]
-
-
-       
-        # グラフ作成
-        plt.barh(v_name, plot_data, color=color)
-
-        # カウント
-        count += 1
-
-    # グラフ表示
-    plt.show()
-    plt.savefig("aaaa.png")
+    return eigen, v_name
     
-    
-
-
-
 
 # メイン関数
 def main():
     df = edit_data()
     # 第n主成分まで生成
     n = 8
-    pca(df, n)
+    (eigen, v_name) = pca(df, n)
+    img_output(eigen, v_name)
 
 # 実行部分
 if __name__ == "__main__":
