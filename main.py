@@ -21,6 +21,10 @@ def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
     # 各変数を横棒グラフへ
     count = 1
     for index in eigen.index:
+
+        # 文字大きさ
+        plt.rcParams["font.size"] = 15
+
         # サブプロット
         plt.subplot(1, 8, count)
 
@@ -46,8 +50,9 @@ def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
         count += 1
 
     # グラフ表示
-    plt.show()
     plt.savefig("aaaa.png")
+    plt.show()
+
 
 # データ加工
 def edit_data():
@@ -72,6 +77,9 @@ def edit_data():
 
     # 打ち込み確認行、分類計~国籍計列　削除
     df = df.drop(index="打込確認",  columns=drop_columns)
+
+    # テスト削除(15変数に縛る -> 結構いい感じに表示される)
+    df = df.drop(columns=df.loc[:, "ぼーっとできる場所だと感じる":"国籍不明"].columns, axis=1)
 
     # 経過時間->int型へ
     df["通行者20人到達時間"] = df["通行者20人到達時間"].apply(time_convert_into_int)
@@ -139,7 +147,6 @@ def pca(df:pd.DataFrame, n:int):
 
     return eigen, v_name
     
-
 # メイン関数
 def main():
     df = edit_data()
@@ -151,6 +158,3 @@ def main():
 # 実行部分
 if __name__ == "__main__":
     main()
-
-
-    
