@@ -69,24 +69,45 @@ def pca(df:pd.DataFrame, n:int):
     #plt.xlabel("PC1")
     #lt.ylabel("PC2")
 
+    # PCA の固有値
+    print("******固有値******")
+    eigenvalue = pd.DataFrame(pca.explained_variance_, index=["PC{}".format(x + 1) for x in range(0, n)])
+    for index, row in eigenvalue.iterrows():
+        print(f"{index}固有値：{row[0]}")
+
     # 寄与率(各主成分についてどれだけ説明できてるか -> 累積寄与率は最終的には1になる)
-    #ratio = pd.DataFrame(pca.explained_variance_ratio_, index=["PC{}".format(x + 1) for x in range(0, n)])
-    
+    print("******寄与率******")
+    ratio = pd.DataFrame(pca.explained_variance_ratio_, index=["PC{}".format(x + 1) for x in range(0, n)])
+    sum = 0
+    for index, row in ratio.iterrows():
+        sum += row[0]
+        print(f"{index}寄与率：{row[0]} (累積寄与率：{sum})")
+
     # 負荷率(各主成分に対して、各変数がどの程度影響しているか)
     eigen_vector = pca.components_
     eigen =pd.DataFrame(eigen_vector,
                         columns=[dfs_cleaned.columns],
-                        index = ["主成分{}".format(x+1) for x in range(0, n)])
+                        index = ["PC{}".format(x+1) for x in range(0, n)])
     print(eigen)
+
+    # excelデータへ変換
+    with pd.ExcelWriter("PCA_OUTPUT.xlsx") as writer:
+        eigenvalue.to_excel(writer, sheet_name="固有値")
+        ratio.to_excel(writer, sheet_name="寄与率")
+        eigen.to_excel(writer, sheet_name="負荷率")
+
     plt.show()
 
 # メイン関数
 def main():
     df = edit_data()
     # 第n主成分まで生成
-    n = 10
+    n = 20
     pca(df, n)
 
 # 実行部分
 if __name__ == "__main__":
     main()
+
+
+    
