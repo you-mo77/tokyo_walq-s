@@ -79,7 +79,8 @@ def edit_data():
     df = df.drop(index="打込確認",  columns=drop_columns)
 
     # テスト削除(15変数に縛る -> 結構いい感じに表示される)
-    df = df.drop(columns=df.loc[:, "ぼーっとできる場所だと感じる":"国籍不明"].columns, axis=1)
+    #del_columns = ["ぼーっとできる場所だと感じる", "国籍不明"]
+    #df = df.drop(columns=df.loc[:, del_columns].columns, axis=1)
 
     # 経過時間->int型へ
     df["通行者20人到達時間"] = df["通行者20人到達時間"].apply(time_convert_into_int)
@@ -112,18 +113,22 @@ def pca(df:pd.DataFrame, n:int):
     #lt.ylabel("PC2")
 
     # PCA の固有値
-    print("******固有値******")
+    #print("******固有値******")
     eigenvalue = pd.DataFrame(pca.explained_variance_, index=["PC{}".format(x + 1) for x in range(0, n)])
+    """
     for index, row in eigenvalue.iterrows():
         print(f"{index}固有値：{row[0]}")
+    """
 
     # 寄与率(各主成分についてどれだけ説明できてるか -> 累積寄与率は最終的には1になる)
-    print("******寄与率******")
+    #print("******寄与率******")
     ratio = pd.DataFrame(pca.explained_variance_ratio_, index=["PC{}".format(x + 1) for x in range(0, n)])
+    """
     sum = 0
     for index, row in ratio.iterrows():
         sum += row[0]
         print(f"{index}寄与率：{row[0]} (累積寄与率：{sum})")
+    """
 
     # 負荷率(各主成分に対して、各変数がどの程度影響しているか)
     eigen_vector = pca.components_
@@ -136,7 +141,7 @@ def pca(df:pd.DataFrame, n:int):
     v_name = eigen.columns.to_numpy()
     v_name = [i[0] for i in v_name]
     v_name = np.array(v_name)
-    print(v_name)
+    #print(v_name)
 
     # excelデータへ変換
     with pd.ExcelWriter("PCA_OUTPUT.xlsx") as writer:
