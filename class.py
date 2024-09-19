@@ -41,6 +41,7 @@ def gui(score:pd.DataFrame, df:pd.DataFrame):
 
 # K-means 
 def k_means(df:pd.DataFrame, score:pd.DataFrame, pc1:str, pc2:str, n:int):
+    plt.clf()
     print(f" *****pc1:{pc1} pc2:{pc2} cluster:{n}***** ")
     
     # 街路番号抽出してscoreのインデックスへ
