@@ -90,7 +90,7 @@ def edit_data():
     df["通行者20人到達時間"] = df["通行者20人到達時間"].apply(time_convert_into_int)
 
     # 抽出
-    df = df.loc[:, "通行者20人到達時間":"無電柱化されている"]
+    #df = df.loc[:, "通行者20人到達時間":"無電柱化されている"]
 
     return df
 
@@ -117,7 +117,14 @@ def pca(df:pd.DataFrame, n:int):
     # 主成分プロット(とりあえず第1, 第2主成分)
     #plt.scatter(feature[0:feature.shape[0]-1, 0], feature[0:feature.shape[0]-1, 1])
     #plt.xlabel("PC1")
-    #lt.ylabel("PC2")
+    #plt.ylabel("PC2")
+    #plt.show()
+    #exit()
+
+    print("feature")
+    print(feature)
+    print("score")
+    print(score)
 
     # PCA の固有値
     #print("******固有値******")
