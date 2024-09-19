@@ -20,13 +20,17 @@ def time_convert_into_int(time_str:str):
 def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
     # 各変数を横棒グラフへ
     count = 1
+
+    # 表題用辞書
+    title = {1:"喜びシェア軸", 2:"やさしい道のり軸", 3:"にぎわい創出軸", 4:" 多様性の輝き軸", 5:"安心快適軸", 6:"文化交差軸", 7:"まちなか発見軸", 8:"にぎわいリズム軸"}
+
     for index in eigen.index:
 
         # サブプロット
         plt.subplot(1, 8, count)
         
         # 各表題
-        plt.title("PC"+str(count), fontsize = 10)
+        plt.title(title[count], fontsize = 12)
 
 
         # 文字大きさ
