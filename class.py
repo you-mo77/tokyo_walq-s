@@ -36,6 +36,9 @@ def gui(score:pd.DataFrame, df:pd.DataFrame):
             # 画像作成
             k_means(df, score, values["-x-"], values["-y-"], int(values["-cluster-"]))
 
+            # 画像表示
+            window["-image-"].update(r"k_means\\" + values["-x-"] + "_" + values["-y-"] + "_" + values["-cluster-"] + ".png")
+
 
 
 
