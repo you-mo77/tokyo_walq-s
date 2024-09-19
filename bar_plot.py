@@ -121,11 +121,6 @@ def pca(df:pd.DataFrame, n:int):
     #plt.show()
     #exit()
 
-    print("feature")
-    print(feature)
-    print("score")
-    print(score)
-
     # PCA の固有値
     #print("******固有値******")
     eigenvalue = pd.DataFrame(pca.explained_variance_, index=["PC{}".format(x + 1) for x in range(0, n)])

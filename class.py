@@ -8,9 +8,28 @@ from datetime import datetime, timedelta
 import japanize_matplotlib
 import PySimpleGUI as sg
 import bar_plot
+import tempfile
 
 # gui(どの主成分を使うかを2つのプルダウンメニューとかで指定　クラスタ数も指定 -> GO!)
-#def init_gui():
+def gui(score:list[str]):
+    # ウィンドウレイアウト
+    layout = [[sg.Text("横軸"), sg.Combo(score, key="-x-"), sg.Text("   "), sg.Text("縦軸"), sg.Combo(score, key="-y-")],
+              [sg.Image(filename="", key="-image-")],
+              [sg.Button("Run")]]
+    
+    # ウィンドウ作成
+    window = sg.Window("主成分プロット", layout)
+
+    # イベントループ
+    while True:
+        event, values = window.read()
+
+        # 終了
+        if event == sg.WIN_CLOSED:
+            break
+
+
+
 
 # K-means 
 def k_means(df:pd.DataFrame, score:pd.DataFrame, pc1:str, pc2:str, n:int):
@@ -42,9 +61,9 @@ def k_means(df:pd.DataFrame, score:pd.DataFrame, pc1:str, pc2:str, n:int):
         for j in clasted.index:
             plt.text(clasted.loc[j, pc1], clasted.loc[j, pc2], j)
         
+    # グラフ保存
+    plt.savefig(r"k_means\\" + pc1 + "_" + pc2 + "_" + str(n) + ".png")
 
-    # グラフ表示
-    plt.show()
 
 # メイン関数
 def main():
@@ -54,8 +73,7 @@ def main():
     n = 8
     (score, eigenvalue, ratio, eigen, v_name) = bar_plot.pca(df, n)
 
-    k_means(df, score, "PC1", "PC2", 4)
-
+    gui(score.columns.tolist())
 
     
 
