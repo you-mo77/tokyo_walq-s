@@ -32,7 +32,6 @@ def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
         # 各表題
         plt.title(title[count], fontsize = 12)
 
-
         # 文字大きさ
         plt.yticks(fontsize=15)
 
@@ -89,6 +88,9 @@ def edit_data():
 
     # 経過時間->int型へ
     df["通行者20人到達時間"] = df["通行者20人到達時間"].apply(time_convert_into_int)
+
+    # 抽出
+    df = df.loc[:, "通行者20人到達時間":"無電柱化されている"]
 
     return df
 
