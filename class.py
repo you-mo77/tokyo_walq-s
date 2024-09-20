@@ -86,7 +86,7 @@ def main():
 
     # 第n主成分まで生成
     n = 8
-    (score, eigenvalue, ratio, eigen, v_name) = bar_plot.pca(df, n)
+    (score, eigenvalue, ratio, eigen) = bar_plot.pca(df, n)
 
     gui(score, df)
 
