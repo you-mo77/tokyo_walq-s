@@ -17,14 +17,21 @@ def time_convert_into_int(time_str:str):
     return time_int
 
 # グラフ出力
-def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
+def img_output(eigen:pd.DataFrame):
+
+    # columns各値ががタプルで格納されているので、戻す。
+    eigen.columns = [tup[0] for tup in eigen.columns]
+
+    # 表示データ制限
+    output_eigen = eigen.loc[:, "通行者20人到達時間":"無電柱化されている"]
+
     # 各変数を横棒グラフへ
     count = 1
 
     # 表題用辞書
-    title = {1:"喜びシェア軸", 2:"やさしい道のり軸", 3:"にぎわい創出軸", 4:" 多様性の輝き軸", 5:"安心快適軸", 6:"文化交差軸", 7:"まちなか発見軸", 8:"にぎわいリズム軸"}
+    title = {1:"のんびり交流軸", 2:"人にやさしい街路軸", 3:"多様性輝き軸", 4:"にぎわい喜び軸", 5:"グローバル絆づくり軸", 6:"都市づくり軸", 7:"笑顔の輪拡がり軸", 8:"多文化ふれあい軸"}
 
-    for index in eigen.index:
+    for index in output_eigen.index:
 
         # サブプロット
         plt.subplot(1, 8, count)
@@ -44,11 +51,14 @@ def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
         plt.subplots_adjust(wspace=0, hspace=0, left=0.3)
 
         # 本ループのプロットデータを抽出 -> ndarray
-        plot_data = eigen.loc[index].to_numpy()
+        plot_data = output_eigen.loc[index].to_numpy()
         color = [("#ee7800" if i > 0 else "b") for i in plot_data]
 
+        # 表示文字
+        v_name = output_eigen.columns.tolist()
+
         # グラフ作成
-        plt.barh(v_name, plot_data, color=color,)
+        plt.barh(v_name, plot_data, color=color)
 
         # カウント
         count += 1
@@ -62,7 +72,7 @@ def img_output(eigen:pd.DataFrame, v_name:np.ndarray):
 # データ加工
 def edit_data():
     # ファイルパス
-    data_path = "調査データ.csv"
+    data_path = "調査データ36.csv"
 
     # データ読み込み(csv -> DataFrame) なお、１行目は空白なので２行目(属性)をcolumns(列のインデックス)に指定しながら読み込んでいる
     df = pd.read_csv(data_path, encoding="shift-jis")
@@ -90,7 +100,7 @@ def edit_data():
     df["通行者20人到達時間"] = df["通行者20人到達時間"].apply(time_convert_into_int)
 
     # 抽出
-    #df = df.loc[:, "通行者20人到達時間":"無電柱化されている"]
+    #df = df.loc[:, "1人":"国籍不明"]
 
     return df
 
@@ -114,6 +124,10 @@ def pca(df:pd.DataFrame, n:int):
     # 主成分得点(各主成分軸状での各データの変換後の値)
     score = pd.DataFrame(feature, columns=["PC{}".format(x + 1) for x in range(0, n)])
 
+    # 主成分得点表に街路番号追加
+    sub = score.round(6)
+    sub["街路番号"] = dfs_cleaned.index.to_list()
+
     # 主成分プロット(とりあえず第1, 第2主成分)
     #plt.scatter(feature[0:feature.shape[0]-1, 0], feature[0:feature.shape[0]-1, 1])
     #plt.xlabel("PC1")
@@ -124,32 +138,30 @@ def pca(df:pd.DataFrame, n:int):
     # PCA の固有値
     #print("******固有値******")
     eigenvalue = pd.DataFrame(pca.explained_variance_, index=["PC{}".format(x + 1) for x in range(0, n)])
-    """
-    for index, row in eigenvalue.iterrows():
-        print(f"{index}固有値：{row[0]}")
-    """
+    #for index, row in eigenvalue.iterrows():
+        #print(f"{index}固有値：{row[0]}")
 
     # 寄与率(各主成分についてどれだけ説明できてるか -> 累積寄与率は最終的には1になる)
     #print("******寄与率******")
     ratio = pd.DataFrame(pca.explained_variance_ratio_, index=["PC{}".format(x + 1) for x in range(0, n)])
-    """
     sum = 0
-    for index, row in ratio.iterrows():
-        sum += row[0]
-        print(f"{index}寄与率：{row[0]} (累積寄与率：{sum})")
-    """
+    #for index, row in ratio.iterrows():
+        #sum += row[0]
+        #print(f"{index}寄与率：{row[0]} (累積寄与率：{sum})")
 
     # 負荷率(各主成分に対して、各変数がどの程度影響しているか)
+    #print("******負荷率******")
     eigen_vector = pca.components_
-    eigen =pd.DataFrame(eigen_vector,
+    loadings = eigen_vector * np.sqrt(eigenvalue.values.reshape(-1, 1))
+    eigen =pd.DataFrame(loadings,
                         columns=[dfs_cleaned.columns],
                         index = ["PC{}".format(x+1) for x in range(0, n)])
     #print(eigen)
 
     # 要素名抽出(以降のグラフ表示の際に使用)
-    v_name = eigen.columns.to_numpy()
-    v_name = [i[0] for i in v_name]
-    v_name = np.array(v_name)
+    #v_name = eigen.columns.to_numpy()
+    #v_name = [i[0] for i in v_name]
+    #v_name = np.array(v_name)
     #print(v_name)
 
     # excelデータへ変換
@@ -159,15 +171,18 @@ def pca(df:pd.DataFrame, n:int):
         eigen.to_excel(writer, sheet_name="負荷率")
         score.to_excel(writer, sheet_name="主成分得点表")
 
-    return score, eigenvalue, ratio, eigen, v_name
+    # csv化
+    sub.to_csv(r"主成分得点表.csv")
+
+    return score, eigenvalue, ratio, eigen
     
 # メイン関数
 def main():
     df = edit_data()
     # 第n主成分まで生成
     n = 8
-    (score, eigenvalue, ratio, eigen, v_name) = pca(df, n)
-    img_output(eigen, v_name)
+    (score, eigenvalue, ratio, eigen) = pca(df, n)
+    img_output(eigen)
 
 # 実行部分
 if __name__ == "__main__":
