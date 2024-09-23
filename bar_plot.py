@@ -57,9 +57,15 @@ def img_output(eigen:pd.DataFrame):
 
         # 表示文字
         v_name = output_eigen.columns.tolist()
+        print(v_name)
 
         # グラフ作成
         plt.barh(v_name, plot_data, color=color)
+
+        # 数値表示(以降消すかも　PC4に表示バグあり)
+        for idx, data in enumerate(plot_data):
+            plt.text(0.1, idx, str(round(data, 3)), size = "x-large")
+
 
         # カウント
         count += 1
