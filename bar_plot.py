@@ -23,13 +23,14 @@ def img_output(eigen:pd.DataFrame):
     eigen.columns = [tup[0] for tup in eigen.columns]
 
     # 表示データ制限
-    output_eigen = eigen.loc[:, "通行者20人到達時間":"無電柱化されている"]
+    
+    output_eigen = eigen.loc[:, "1人":"国籍不明"]
 
     # 各変数を横棒グラフへ
     count = 1
 
     # 表題用辞書
-    title = {1:"のんびり交流軸", 2:"人にやさしい街路軸", 3:"多様性輝き軸", 4:"にぎわい喜び軸", 5:"グローバル絆づくり軸", 6:"都市づくり軸", 7:"笑顔の輪拡がり軸", 8:"多文化ふれあい軸"}
+    title = {1:"のんびり交流・\n喜びシェア軸", 2:"人にやさしい街路軸", 3:"多様性輝き軸", 4:"にぎわい喜び軸", 5:"グローバル絆づくり軸", 6:"都市づくり軸", 7:"女性が輝く交流軸", 8:"多文化ふれあい軸"}
 
     for index in output_eigen.index:
 
